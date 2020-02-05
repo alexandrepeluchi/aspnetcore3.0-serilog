@@ -21,9 +21,6 @@ namespace aspnetcore3._0_serilog
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-                .CreateLogger();
         }
 
         public IConfiguration Configuration { get; }

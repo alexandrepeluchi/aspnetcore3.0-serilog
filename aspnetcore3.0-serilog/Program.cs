@@ -20,10 +20,6 @@ namespace aspnetcore3._0_serilog
                 .AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
 
-            var logConfig = new LoggerConfiguration()
-                .ReadFrom.Configuration(appConfig)
-                .CreateLogger();
-
             Serilog.Debugging.SelfLog.Enable(Console.Error);
 
             try
