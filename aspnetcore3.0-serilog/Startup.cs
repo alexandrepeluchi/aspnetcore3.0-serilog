@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -8,6 +10,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 
 namespace aspnetcore3._0_serilog
 {
@@ -16,6 +21,9 @@ namespace aspnetcore3._0_serilog
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
         }
 
         public IConfiguration Configuration { get; }
@@ -24,6 +32,10 @@ namespace aspnetcore3._0_serilog
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            var stringConexao = Configuration.GetConnectionString("Default");
+            
+            ConfiguraSeriLog(stringConexao);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +63,17 @@ namespace aspnetcore3._0_serilog
             {
                 endpoints.MapRazorPages();
             });
+        }
+
+        private void ConfiguraSeriLog(string stringConexao)
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .WriteTo.MSSqlServer(stringConexao, "Log", autoCreateSqlTable: true)
+                .WriteTo.Console()
+                .CreateLogger();
         }
     }
 }
