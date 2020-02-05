@@ -1,1 +1,1 @@
-# core-serilog
+# aspnetcore3.0-serilog
